@@ -32,10 +32,10 @@ jobs:
         # 创建一个临时文件夹用来存放 SDK
         New-Item -ItemType Directory -Force -Path sdk-windows
         
-        # 全盘搜罗这三个宝贝，并全部复制进文件夹
-        Get-ChildItem -Recurse -Filter "leechcore.dll" | Copy-Item -Destination sdk-windows\
-        Get-ChildItem -Recurse -Filter "leechcore.lib" | Copy-Item -Destination sdk-windows\
-        Get-ChildItem -Recurse -Filter "leechcore.h" | Copy-Item -Destination sdk-windows\
+        # 搜索文件，排除新建的 sdk-windows 目录，并限制只取第一个结果（避免 bin 和 obj 目录下的文件互相覆盖）
+        Get-ChildItem -Recurse -Filter "leechcore.dll" | Where-Object { $_.FullName -notmatch "sdk-windows" } | Select-Object -First 1 | Copy-Item -Destination sdk-windows\
+        Get-ChildItem -Recurse -Filter "leechcore.lib" | Where-Object { $_.FullName -notmatch "sdk-windows" } | Select-Object -First 1 | Copy-Item -Destination sdk-windows\
+        Get-ChildItem -Recurse -Filter "leechcore.h" | Where-Object { $_.FullName -notmatch "sdk-windows" } | Select-Object -First 1 | Copy-Item -Destination sdk-windows\
         
         # 将文件夹压缩成 ZIP 文件
         Compress-Archive -Path sdk-windows\* -DestinationPath leechcore-sdk-windows.zip
