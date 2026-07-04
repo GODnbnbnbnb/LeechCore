@@ -12,12 +12,14 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+      with:
+        submodules: true
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
     - name: Build Solution
-      run: msbuild leechcore/leechcore.vcxproj /p:Configuration=Release /p:Platform=x64
+      run: msbuild LeechCore.sln /t:leechcore /p:Configuration=Release /p:Platform=x64
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
