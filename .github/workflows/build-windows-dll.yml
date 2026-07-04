@@ -1,13 +1,19 @@
-name: Build LeechCore Windows DLL
+name: Build & Release LeechCore SDK (Read-Only)
 
 on:
-  push:
-    branches: [ "master", "main" ]
-  workflow_dispatch: 
+  # 允许手动触发，并可以填写版本号
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发布版本号 (例如: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
 
 jobs:
-  build-dll:
+  build-and-release:
     runs-on: windows-latest
+    permissions:
+      contents: write # 赋予创建 Release 的权限
 
     steps:
     - name: Checkout Code
@@ -21,11 +27,23 @@ jobs:
     - name: Build Solution
       run: msbuild LeechCore.sln /t:leechcore /p:Configuration=Release /p:Platform=x64
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+    - name: Package SDK into ZIP
+      run: |
+        # 创建一个临时文件夹用来存放 SDK
+        New-Item -ItemType Directory -Force -Path sdk-windows
+        
+        # 全盘搜罗这三个宝贝，并全部复制进文件夹
+        Get-ChildItem -Recurse -Filter "leechcore.dll" | Copy-Item -Destination sdk-windows\
+        Get-ChildItem -Recurse -Filter "leechcore.lib" | Copy-Item -Destination sdk-windows\
+        Get-ChildItem -Recurse -Filter "leechcore.h" | Copy-Item -Destination sdk-windows\
+        
+        # 将文件夹压缩成 ZIP 文件
+        Compress-Archive -Path sdk-windows\* -DestinationPath leechcore-sdk-windows.zip
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: leechcore-sdk
-        path: |
-          **/leechcore.dll
-          **/leechcore.lib
-          **/leechcore.h
+        tag_name: ${{ github.event.inputs.version }}
+        name: "LeechCore Windows SDK ${{ github.event.inputs.version }} (Read-Only)"
+        files: leechcore-sdk-windows.zip
+        body: "自动编译的纯净版 LeechCore SDK。源码已物理关闭 `LcWriteMemory`，处于完全只读模式以保证安全。"
