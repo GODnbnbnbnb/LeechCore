@@ -24,5 +24,8 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: leechcore-dll-x64
-        path: '**/x64/Release/leechcore.dll'
+        name: leechcore-sdk
+        path: |
+          **/leechcore.dll
+          **/leechcore.lib
+          **/leechcore.h
