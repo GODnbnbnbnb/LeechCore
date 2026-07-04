@@ -953,6 +953,7 @@ VOID LcWriteScatter_GatherContigious(_In_ PLC_CONTEXT ctxLC, _In_ DWORD cMEMs, _
 */
 EXPORTED_FUNCTION VOID LcWriteScatter(_In_ HANDLE hLC, _In_ DWORD cMEMs, _Inout_ PPMEM_SCATTER ppMEMs)
 {
+    return;
     PLC_CONTEXT ctxLC = (PLC_CONTEXT)hLC;
     QWORD i, tmStart = LcCallStart();
     if(!ctxLC || ctxLC->version != LC_CONTEXT_VERSION) { return; }
@@ -995,6 +996,7 @@ EXPORTED_FUNCTION VOID LcWriteScatter(_In_ HANDLE hLC, _In_ DWORD cMEMs, _Inout_
 _Success_(return)
 EXPORTED_FUNCTION BOOL LcWrite(_In_ HANDLE hLC, _In_ QWORD pa, _In_ DWORD cb, _In_reads_(cb) PBYTE pb)
 {
+    return FALSE;
     BOOL fResult = FALSE;
     PBYTE pbBuffer = NULL;
     DWORD i = 0, oA = 0, cbP, cMEMs;
